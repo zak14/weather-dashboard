@@ -26,11 +26,22 @@ api.interceptors.response.use(
 
 
 
+
+
+export const getWeatherByCoords = async (lat: number, lon: number): Promise<WeatherData> => {
+  const { data } = await api.get<WeatherData>('/weather', {
+    params: { 
+      lat, 
+      lon 
+    },
+  });
+  return data;
+};
+
+
 export const getWeatherByCity = async (city: string): Promise<WeatherData> => {
     const { data } = await api.get<WeatherData>('/weather',{
         params: { q: city },
     });
     return data;
 };
-
-// Test call: Open Console to see result

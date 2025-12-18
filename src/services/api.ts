@@ -1,8 +1,12 @@
 import axios from "axios";
+import type { WeatherData } from "../types";
+
+
+
 
 // Let's create a pre-configured instance
 const api = axios.create({
-    baseURL: import.meta.env.VITE_BASE_UR,
+    baseURL: import.meta.env.VITE_BASE_URL,
     params: {
         appid:import.meta.env.VITE_OPENWEATHER_API_KEY,
         units:'metric', // We use Celsius, not Fahrenheit!
@@ -21,4 +25,12 @@ api.interceptors.response.use(
 )
 
 
-export default api;
+
+export const getWeatherByCity = async (city: string): Promise<WeatherData> => {
+    const { data } = await api.get<WeatherData>('/weather',{
+        params: { q: city },
+    });
+    return data;
+};
+
+// Test call: Open Console to see result

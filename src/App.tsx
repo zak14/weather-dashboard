@@ -2,19 +2,26 @@ import { useState, useEffect } from 'react';
 import { useWeather } from './hooks/useWeather';
 import { SearchBar } from './components/SearchBar';
 import { WeatherCard } from './components/WeatherCard';
-import { Loader2, AlertCircle, MapPin } from 'lucide-react';
+import { Loader2, AlertCircle, MapPin, Navigation } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query'; // Import the client for manual actions
 import { getWeatherByCoords } from './services/api';
+
+const DEFAULT_CITIES =[
+  "New York",
+  "Hong Kong",
+  "Rio de Janeiro",
+  "Rome"
+]
 
 
 function App() {
   const [city, setCity] = useState<string>('');
-  const queryClient = useQueryClient(); // Ci serve per manipolare la cache manualmente
+  const queryClient = useQueryClient(); // We need it to manipulate the cache manually.
 
-  // 1. Hook standard per la ricerca testuale
+  // Standard hook for text search
   const { data, isLoading, isError, error } = useWeather(city);
 
-  // 2. Logica di Geolocalizzazione (Eseguita solo 1 volta all'avvio)
+  // Geolocation logic (Performed only once at startup)
   useEffect(() => {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -22,25 +29,23 @@ function App() {
           const { latitude, longitude } = position.coords;
           
           try {
-            // Scarichiamo i dati manualmente usando le coordinate
+            // We download the data manually using the coordinates.
             const geoData = await getWeatherByCoords(latitude, longitude);
             
-            // Trucco da Senior: Aggiorniamo la cache di React Query "fingendo"
-            // che l'utente abbia cercato il nome della città restituita dal GPS.
-            // Questo popola la UI istantaneamente.
+            // We update the React Query cache by “pretending” that the user searched for the city name returned by the GPS. This populates the UI instantly.
             queryClient.setQueryData(['weather', geoData.name], geoData);
-            setCity(geoData.name); // Imposta il nome della città nella barra
+            setCity(geoData.name); //  Enter the name of the city in the bar
           } catch (err) {
             console.error("Geo API Error:", err);
           }
         },
         (error) => {
           console.log("Geolocation blocked or error:", error.message);
-          // Non facciamo nulla, l'utente cercherà manualmente
+          // We do nothing; the user will search manually.
         }
       );
     }
-  }, [queryClient]); // Dipendenze dell'effetto
+  }, [queryClient]); // Effect dependencies
 
   return (
     <div className="min-h-screen bg-slate-900 flex flex-col items-center pt-20 px-4">
@@ -50,7 +55,7 @@ function App() {
 
       <SearchBar onSearch={(newCity) => setCity(newCity)} />
 
-      {/* Sezione Loading */}
+      {/* Section Loading */}
       {isLoading && (
         <div className="mt-12 flex flex-col items-center gap-2 text-blue-400">
           <Loader2 className="w-10 h-10 animate-spin" />
@@ -58,12 +63,12 @@ function App() {
         </div>
       )}
 
-      {/* Sezione Errore */}
+      {/*  Error Section  */}
       {isError && (
         <div className="mt-8 flex items-center gap-2 text-red-400 bg-red-400/10 px-4 py-3 rounded-lg border border-red-400/20">
           <AlertCircle className="w-5 h-5" />
           <span>
-            {(error as any)?.response?.data?.message || "Città non trovata."}
+            {(error as any)?.response?.data?.message || "City not found."}
           </span>
         </div>
       )}
@@ -73,14 +78,45 @@ function App() {
         <WeatherCard data={data} />
       )}
       
-      {/* Stato Iniziale (Nessuna ricerca, Nessun dato) */}
+      {/* Initial status (No search, No data)  */}
       {!city && !isLoading && !data && (
         <div className="mt-12 flex flex-col items-center text-slate-500">
           <MapPin className="w-12 h-12 mb-4 opacity-50" />
-          <p className="text-lg">Abilita la localizzazione o cerca una città 🌍</p>
+          <p className="text-lg">Enable location services or search for a city 🌍</p>
         </div>
       )}
+      <div className="mt-16 mb-16 w-full max-w-md border-t border-slate-800 pt-8">
+        <div className="flex items-center gap-2 mb-4 text-slate-400">
+          <Navigation className="w-4 h-4" />
+          <span className="text-sm font-semibold uppercase tracking-wider">
+            Popular Destinations
+          </span>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-3">
+          {DEFAULT_CITIES.map((cityName) => (
+            <button
+              key={cityName}
+              onClick={() => setCity(cityName)} // Basta cambiare lo stato e l'hook farà il resto!
+              className={`
+                py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200
+                border border-slate-700 shadow-sm text-left
+                ${city === cityName 
+                  ? 'bg-blue-600 text-white border-blue-500 ring-2 ring-blue-500/20' // Stile se attivo
+                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white hover:border-slate-600' // Stile default
+                }
+              `}
+            >
+              {cityName}
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
+  
+
+
+
   );
 }
 

@@ -15,18 +15,16 @@ const DEFAULT_CITIES =[
 
 
 // Componente "Wrapper" che scarica i dati per la singola card
-const CityWidget = ({ cityName, onClick }: { cityName: string; onClick: () => void }) => {
-  // Ogni card ha il suo hook indipendente!
+const CityWidget = ({ cityName }: { cityName: string }) => {
   const { data, isLoading } = useWeather(cityName);
 
   if (isLoading || !data) {
-    // Scheletro di caricamento mentre scarica i dati
-    return <div className="w-full h-80 bg-slate-800/50 rounded-xl animate-pulse border border-slate-700"></div>;
+    return <div className="w-full h-full min-h-[300px] bg-slate-800/50 rounded-xl animate-pulse border border-slate-700"></div>;
   }
 
   return (
-    <div onClick={onClick} className="cursor-pointer transition-transform hover:scale-[1.02] hover:shadow-xl active:scale-95">
-      {/* Riusiamo esattamente la stessa grafica della card principale */}
+    // Ho rimosso 'cursor-pointer', 'onClick' e gli effetti 'hover:scale'
+    <div className="h-full">
       <WeatherCard data={data} />
     </div>
   );
@@ -76,7 +74,7 @@ function App() {
 
       {/* Section Loading */}
       {isLoading && (
-        <div className="mt-12 flex flex-col items-center gap-2 text-blue-400">
+        <div className="mt-8 flex flex-col items-center gap-2 text-blue-400">
           <Loader2 className="w-10 h-10 animate-spin" />
           <p className="text-sm font-medium animate-pulse">Fetching weather data...</p>
         </div>
@@ -99,7 +97,7 @@ function App() {
       
       {/*Initial status (No search, No data)*/}
       {!city && !isLoading && !data && (
-        <div className="mt-12 flex flex-col items-center text-slate-500">
+        <div className="mt-8 flex flex-col items-center text-slate-500">
           <MapPin className="w-12 h-12 mb-4 opacity-50" />
           <p className="text-lg">Enable location services or search for a city 🌍</p>
         </div>
@@ -107,9 +105,9 @@ function App() {
 
      
         
-        {/* --- NUOVA SEZIONE: GRIGLIA DASHBOARD COMPLETA --- */}
+   
       <div className="mt-8 w-full max-w-7xl">
-       <div className="mt-8 mb-16 w-full border-t border-slate-800 pt-8">
+       <div className="mt-8 mb-12 w-full border-t border-slate-800 pt-8">
         <div className="flex items-center gap-2 mb-4 text-slate-400">
           <Navigation className="w-4 h-4" />
           <span className="text-sm font-semibold uppercase tracking-wider">
@@ -117,13 +115,13 @@ function App() {
           </span>
         </div>
 
-        {/* Griglia Responsiva: 1 colonna su mobile, 2 su tablet, 4 su PC enorme */}
+        {/* Responsive Grid: 1 column on mobile, 2 on tablet, 4 on large PC */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
           {DEFAULT_CITIES.map((cityName) => (
             <CityWidget 
               key={cityName} 
               cityName={cityName} 
-               // Se clicchi, la porta anche nella vista principale
+        
             />
           ))}
         </div>

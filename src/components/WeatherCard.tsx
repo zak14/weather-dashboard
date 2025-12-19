@@ -1,22 +1,48 @@
-import React from 'react';
-import { Cloud, Droplets, Wind, MapPin } from 'lucide-react';
-import type { WeatherData } from '../types';
+import React from "react";
+import { Cloud, Droplets, Wind, MapPin } from "lucide-react";
+import type { WeatherData } from "../types";
 
 interface WeatherCardProps {
   data: WeatherData;
 }
 
+// Calculate the local time based on the API time zone offset
+const getLocalTime = (timezoneOffset: number) => {
+  const d = new Date();
+  const localTime = d.getTime();
+  const localOffset = d.getTimezoneOffset() * 60000;
+  const utc = localTime + localOffset;
+  const cityTime = utc + 1000 * timezoneOffset;
+  const nd = new Date(cityTime);
+
+  return nd.toLocaleTimeString("it-IT", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+};
+
 export const WeatherCard: React.FC<WeatherCardProps> = ({ data }) => {
   return (
-    <div className="w-full h-full flex, flex-col, justify-between max-w-md bg-slate-800/50 backdrop-blur-md rounded-xl p-8 text-white shadow-2xl border border-slate-700 mt-8">
-      {/* Header: Città e Nazione */}
+    <div className="w-full h-full flex flex-col justify-between max-w-md bg-slate-800/50 backdrop-blur-md rounded-xl p-8 text-white shadow-2xl border border-slate-700 mt-8">
+      {/* Header: City and Country */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <MapPin className="text-blue-400 w-6 h-6" />
-          <h2 className="text-2xl font-bold">{data.name}, {data.sys.country}</h2>
+          <div className="flex flex-col">
+            <h2 className="text-2xl font-bold leading-none">
+              {data.name}, {data.sys.country}
+            </h2>
+          </div>
         </div>
         <span className="bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full text-sm font-medium">
           Now
+        </span>
+      </div>
+      <div className="mt-2 flex justify-center">
+        {/* time display */}
+        <span className="text-xl text-slate-400 font-medium mt-1">
+          {getLocalTime(data.timezone)}
         </span>
       </div>
 
@@ -49,7 +75,9 @@ export const WeatherCard: React.FC<WeatherCardProps> = ({ data }) => {
         </div>
         <div className="flex flex-col items-center">
           <Cloud className="w-6 h-6 text-gray-400 mb-2" />
-          <span className="font-bold text-lg">{Math.round(data.main.feels_like)}°</span>
+          <span className="font-bold text-lg">
+            {Math.round(data.main.feels_like)}°
+          </span>
           <span className="text-xs text-slate-500 uppercase">Perceived</span>
         </div>
       </div>

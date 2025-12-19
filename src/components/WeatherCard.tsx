@@ -8,7 +8,7 @@ interface WeatherCardProps {
 
 export const WeatherCard: React.FC<WeatherCardProps> = ({ data }) => {
   return (
-    <div className="w-full max-w-md bg-slate-800/50 backdrop-blur-md rounded-xl p-8 text-white shadow-2xl border border-slate-700 mt-8">
+    <div className="w-full h-full flex, flex-col, justify-between max-w-md bg-slate-800/50 backdrop-blur-md rounded-xl p-8 text-white shadow-2xl border border-slate-700 mt-8">
       {/* Header: Città e Nazione */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">

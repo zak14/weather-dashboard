@@ -14,6 +14,25 @@ const DEFAULT_CITIES =[
 ]
 
 
+// Componente "Wrapper" che scarica i dati per la singola card
+const CityWidget = ({ cityName, onClick }: { cityName: string; onClick: () => void }) => {
+  // Ogni card ha il suo hook indipendente!
+  const { data, isLoading } = useWeather(cityName);
+
+  if (isLoading || !data) {
+    // Scheletro di caricamento mentre scarica i dati
+    return <div className="w-full h-80 bg-slate-800/50 rounded-xl animate-pulse border border-slate-700"></div>;
+  }
+
+  return (
+    <div onClick={onClick} className="cursor-pointer transition-transform hover:scale-[1.02] hover:shadow-xl active:scale-95">
+      {/* Riusiamo esattamente la stessa grafica della card principale */}
+      <WeatherCard data={data} />
+    </div>
+  );
+};
+
+
 function App() {
   const [city, setCity] = useState<string>('');
   const queryClient = useQueryClient(); // We need it to manipulate the cache manually.
@@ -78,39 +97,37 @@ function App() {
         <WeatherCard data={data} />
       )}
       
-      {/* Initial status (No search, No data)  */}
+      {/*Initial status (No search, No data)*/}
       {!city && !isLoading && !data && (
         <div className="mt-12 flex flex-col items-center text-slate-500">
           <MapPin className="w-12 h-12 mb-4 opacity-50" />
           <p className="text-lg">Enable location services or search for a city 🌍</p>
         </div>
       )}
-      <div className="mt-16 mb-16 w-full max-w-md border-t border-slate-800 pt-8">
+
+     
+        
+        {/* --- NUOVA SEZIONE: GRIGLIA DASHBOARD COMPLETA --- */}
+      <div className="mt-8 w-full max-w-7xl">
+       <div className="mt-8 mb-16 w-full border-t border-slate-800 pt-8">
         <div className="flex items-center gap-2 mb-4 text-slate-400">
           <Navigation className="w-4 h-4" />
           <span className="text-sm font-semibold uppercase tracking-wider">
             Popular Destinations
           </span>
         </div>
-        
-        <div className="grid grid-cols-2 gap-3">
+
+        {/* Griglia Responsiva: 1 colonna su mobile, 2 su tablet, 4 su PC enorme */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
           {DEFAULT_CITIES.map((cityName) => (
-            <button
-              key={cityName}
-              onClick={() => setCity(cityName)} // Basta cambiare lo stato e l'hook farà il resto!
-              className={`
-                py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200
-                border border-slate-700 shadow-sm text-left
-                ${city === cityName 
-                  ? 'bg-blue-600 text-white border-blue-500 ring-2 ring-blue-500/20' // Stile se attivo
-                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white hover:border-slate-600' // Stile default
-                }
-              `}
-            >
-              {cityName}
-            </button>
+            <CityWidget 
+              key={cityName} 
+              cityName={cityName} 
+               // Se clicchi, la porta anche nella vista principale
+            />
           ))}
         </div>
+      </div>
       </div>
     </div>
   

@@ -106,7 +106,7 @@ function App() {
      
         
    
-      <div className="mt-8 w-full max-w-7xl">
+      <div className="mt-8">
        <div className="mt-8 mb-12 w-full border-t border-slate-800 pt-8">
         <div className="flex items-center gap-2 mb-4 text-slate-400">
           <Navigation className="w-4 h-4" />

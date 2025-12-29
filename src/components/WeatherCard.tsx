@@ -4,6 +4,7 @@ import type { WeatherData } from "../types";
 
 interface WeatherCardProps {
   data: WeatherData;
+  hourDiff: number;
 }
 
 // Calculate the local time based on the API time zone offset
@@ -22,7 +23,7 @@ const getLocalTime = (timezoneOffset: number) => {
   });
 };
 
-export const WeatherCard: React.FC<WeatherCardProps> = ({ data }) => {
+export const WeatherCard: React.FC<WeatherCardProps> = ({ data, hourDiff }) => {
   return (
     <div className="w-full h-full flex flex-col justify-between max-w-md bg-slate-800/50 backdrop-blur-md rounded-xl p-8 text-white shadow-2xl border border-slate-700 mt-8">
       {/* Header: City and Country */}
@@ -44,6 +45,18 @@ export const WeatherCard: React.FC<WeatherCardProps> = ({ data }) => {
         <span className="text-xl text-slate-400 font-medium mt-1">
           {getLocalTime(data.timezone)}
         </span>
+        {hourDiff !== undefined && hourDiff !== 0 && (
+          <span
+            className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+              hourDiff > 0
+                ? "bg-green-500/20 text-green-400"
+                : "bg-orange-500/20 text-orange-400"
+            }`}
+          >
+            {hourDiff > 0 ? "+" : ""}
+            {hourDiff}h
+          </span>
+        )}
       </div>
 
       {/* Main Temp & Icon */}

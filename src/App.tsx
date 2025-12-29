@@ -15,17 +15,24 @@ const DEFAULT_CITIES =[
 
 
 // Componente "Wrapper" che scarica i dati per la singola card
-const CityWidget = ({ cityName }: { cityName: string }) => {
+const CityWidget = ({ cityName, mainTimezone }: { cityName: string, mainTimezone?: number }) => {
   const { data, isLoading } = useWeather(cityName);
 
   if (isLoading || !data) {
     return <div className="w-full h-full min-h-[300px] bg-slate-800/50 rounded-xl animate-pulse border border-slate-700"></div>;
   }
 
+  let diff = 0;
+  if(mainTimezone !== undefined){
+    diff = (data.timezone - mainTimezone)/3600;
+    diff = Math.round(diff)
+  }
+
+  console.log("2:",diff)
+
   return (
-    // Ho rimosso 'cursor-pointer', 'onClick' e gli effetti 'hover:scale'
     <div className="h-full">
-      <WeatherCard data={data} />
+      <WeatherCard data={data} hourDiff={diff}/>
     </div>
   );
 };
@@ -121,6 +128,7 @@ function App() {
             <CityWidget 
               key={cityName} 
               cityName={cityName} 
+              mainTimezone={data?.timezone}
         
             />
           ))}
